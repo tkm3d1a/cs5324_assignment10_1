@@ -28,5 +28,9 @@ public class ChatUserService {
         chatUserRepo.deleteById(id);
     }
 
+    public void deleteByUsername(String username) {
+        chatUserRepo.deleteByUsername(username);
+    }
+
     //PRIVATE
 }
