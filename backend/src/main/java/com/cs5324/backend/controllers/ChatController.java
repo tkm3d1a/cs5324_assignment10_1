@@ -32,4 +32,11 @@ public class ChatController {
     public ChatMessage sendChatMessage(ChatMessage message) {
         return messageService.saveMessage(message);
     }
+
+    @MessageMapping("/status")
+    @SendTo("/topic/user")
+    public ChatUser changeUserStatus(ChatUser user) {
+        if (user.getCurrentStatus() == null) return null;
+        return userService.saveUser(user);
+    }
 }
