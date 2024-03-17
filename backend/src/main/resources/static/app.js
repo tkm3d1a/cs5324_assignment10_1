@@ -20,13 +20,21 @@ stompClient.onStompError = (frame) => {
 };
 
 function setConnected(connected) {
-    $("#connect").prop("disabled", connected);
-    $("#disconnect").prop("disabled", !connected);
     if (connected) {
-        $("#conversation").show();
+        $("#sign-in-button")    .hide();
+        $("#sign-in-username")  .hide();
+        $("#username")          .hide();
+
+        $("#sign-out-button")   .show();
+        $("#conversation")      .show();
     }
     else {
-        $("#conversation").hide();
+        $("#sign-in-button")    .show();
+        $("#sign-in-username")  .show();
+        $("#username")          .show();
+
+        $("#sign-out-button")   .hide();
+        $("#conversation")      .hide();
     }
     $("#greetings").html("");
 }
@@ -44,7 +52,7 @@ function disconnect() {
 function sendName() {
     stompClient.publish({
         destination: "/app/hello",
-        body: JSON.stringify({'name': $("#name").val()})
+        body: JSON.stringify({'name': $("#chat-msg").val()})
     });
 }
 
@@ -54,7 +62,7 @@ function showGreeting(message) {
 
 $(function () {
     $("form").on('submit', (e) => e.preventDefault());
-    $( "#connect" ).click(() => connect());
-    $( "#disconnect" ).click(() => disconnect());
+    $( "#sign-in-button" ).click(() => connect());
+    $( "#sign-out-button" ).click(() => disconnect());
     $( "#send" ).click(() => sendName());
 });
