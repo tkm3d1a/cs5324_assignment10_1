@@ -15,6 +15,9 @@
     <button onclick="logout()">Logout</button>
     <input type="text" id="message" placeholder="Enter message">
     <button onclick="sendMessage()">Send Message</button>
+    <input type="radio" name="status" value="0" checked> Online
+    <input type="radio" name="status" value="1"> Do Not Disturb
+    <button onclick="changeStatus()">Change Status</button>
 </div>
 
 <div id="log">
@@ -25,6 +28,11 @@
 <div id="messages">
     <h2>Messages:</h2>
     <ul id="message-list"></ul>
+</div>
+
+<div id="user-status">
+    <h2>User Status:</h2>
+    <p id="status-display">No status available</p>
 </div>
 
 <script>
@@ -46,8 +54,16 @@
             const messageList = document.getElementById('message-list');
             const messageItem = document.createElement('li');
             messageItem.textContent = `${messageData.username}: ${messageData.content}`;
-            console.log(messageData);
             messageList.appendChild(messageItem);
+        });
+
+        stompClient.subscribe('/topic/user', function (message) {
+            const statusUpdate = JSON.parse(message.body);
+            console.log(statusUpdate);
+            // Update user status display here
+
+            const statusDisplay = document.getElementById('status-display');
+            statusDisplay.textContent = `${statusUpdate.username}: ${statusUpdate.status}`;
         });
     };
 
@@ -88,13 +104,14 @@
         });
     }
 
-    function changeUserStatus() {
+    function changeStatus() {
         const username = document.getElementById('username').value;
-        const status = document.getElementById('status').value;
+        const status = document.querySelector('input[name="status"]:checked').value;
         const userStatus = {
             username: username,
-            status: status
+            currentStatus: status
         };
+        console.log("Status: ", userStatus)
         stompClient.publish({
             destination: "/app/status",
             body: JSON.stringify(userStatus)
