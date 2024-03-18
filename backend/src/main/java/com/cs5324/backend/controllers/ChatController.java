@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,6 +27,11 @@ public class ChatController {
     public ChatUser userLoggedOn(ChatUser user) {
         return userService.saveUser(user);
     }
+
+    @PostMapping("/logout")
+    public String logoutUser(ChatUser user) {
+        userService.deleteByUsername(user.getUsername());
+        return String.format("User %s logged out.", user.getUsername());
 
     @MessageMapping("/chat")
     @SendTo("/topic/chat")
