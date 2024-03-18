@@ -22,7 +22,8 @@ public class ChatMessage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @ToString.Exclude
-    private ChatUser userId;
+    private ChatUser user;
+    private String username;
     private String content;
     private LocalDateTime createdAt = LocalDateTime.now();
 

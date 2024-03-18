@@ -22,6 +22,10 @@ public class ChatUserService {
     public ChatUser getUserById(Long id){
         return chatUserRepo.findById(id).orElseThrow();
     }
+
+    public ChatUser getUserByUsername(String username) {
+        return chatUserRepo.findByUsername(username).orElseThrow();
+    }
     //UPDATE
     //DELETE
     public void deleteUserById(Long id){
