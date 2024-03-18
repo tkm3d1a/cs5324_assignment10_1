@@ -4,24 +4,18 @@ import com.cs5324.backend.chat.message.ChatMessage;
 import com.cs5324.backend.chat.message.ChatMessageService;
 import com.cs5324.backend.chat.user.ChatUser;
 import com.cs5324.backend.chat.user.ChatUserService;
+import com.cs5324.backend.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
 public class ChatController {
     private final ChatUserService userService;
     private final ChatMessageService messageService;
-
-    @GetMapping
-    public String returnView() {
-        return "test";
-    }
 
     @MessageMapping("/user")
     @SendTo("/topic/user")
@@ -33,28 +27,24 @@ public class ChatController {
     @MessageMapping("/logout")
     @SendTo("/topic/user")
     @Transactional
-    public String logoutUser(ChatUser user) {
+    public ChatUser logoutUser(ChatUser user) {
         userService.deleteByUsername(user.getUsername());
-        return String.format("User %s logged out.", user.getUsername());
+        user.setStatus(Status.OFFLINE);
+        return user;
     }
 
     @MessageMapping("/chat")
     @SendTo("/topic/chat")
     public ChatMessage sendChatMessage(ChatMessage message) {
-        // User Get By Name
-        message.setUser(userService.getUserByUsername(message.getUsername()));
-        System.out.println(message);
         return messageService.saveMessage(message);
     }
 
     @MessageMapping("/status")
     @SendTo("/topic/user")
     public ChatUser changeUserStatus(ChatUser user) {
-        if (user.getCurrentStatus() == null) return null;
+        if (user.getStatus() == null) return null;
         ChatUser user1 = userService.getUserByUsername(user.getUsername());
-        user1.setCurrentStatus(user.getCurrentStatus());
-        System.out.println(user);
-        System.out.println(user1);
+        user1.setStatus(user.getStatus());
         return userService.saveUser(user1);
     }
 }

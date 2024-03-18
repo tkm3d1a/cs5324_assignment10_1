@@ -20,7 +20,7 @@ public class ChatUser {
 
     @Column(unique = true)
     private String username;
-    private Status currentStatus = Status.ONLINE;
+    private Status status = Status.ONLINE;
 
     @Override
     public final boolean equals(Object o) {

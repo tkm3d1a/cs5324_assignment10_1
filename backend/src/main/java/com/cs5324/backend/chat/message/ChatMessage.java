@@ -1,6 +1,5 @@
 package com.cs5324.backend.chat.message;
 
-import com.cs5324.backend.chat.user.ChatUser;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -19,10 +18,6 @@ public class ChatMessage {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @ToString.Exclude
-    private ChatUser user;
     private String username;
     private String content;
     private LocalDateTime createdAt = LocalDateTime.now();
