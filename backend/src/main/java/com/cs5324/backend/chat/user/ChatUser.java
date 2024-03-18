@@ -17,6 +17,8 @@ public class ChatUser {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @Column(unique = true)
     private String username;
     private Status currentStatus;
 
