@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+</head>
+<body>
+<h1>Chat Application</h1>
+
+<div id="chat">
+    <input type="text" id="username" placeholder="Enter username">
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Logout</button>
+    <input type="text" id="message" placeholder="Enter message">
+    <button onclick="sendMessage()">Send Message</button>
+</div>
+
+<div id="log">
+    <h2>Log:</h2>
+    <ul id="log-list"></ul>
+</div>
+
+<div id="messages">
+    <h2>Messages:</h2>
+    <ul id="message-list"></ul>
+</div>
+
+<script>
+    const stompClient = new StompJs.Client({
+        brokerURL: 'ws://localhost:8080/gs-guide-websocket'
+    });
+
+    stompClient.onConnect = function () {
+        stompClient.subscribe('/topic/user', function (message) {
+            const logEntry = message.body;
+            const logList = document.getElementById('log-list');
+            const logItem = document.createElement('li');
+            logItem.textContent = logEntry;
+            logList.appendChild(logItem);
+        });
+
+        stompClient.subscribe('/topic/chat', function (message) {
+            const messageData = JSON.parse(message.body);
+            const messageList = document.getElementById('message-list');
+            const messageItem = document.createElement('li');
+            messageItem.textContent = `${messageData.username}: ${messageData.content}`;
+            console.log(messageData);
+            messageList.appendChild(messageItem);
+        });
+    };
+
+    stompClient.activate();
+
+    function login() {
+        const username = document.getElementById('username').value;
+        const user = {
+            username: username
+        };
+        stompClient.publish({
+            destination: "/app/user",
+            body: JSON.stringify(user)
+        });
+    }
+
+    function logout() {
+        const username = document.getElementById('username').value;
+        const user = {
+            username: username
+        };
+        stompClient.publish({
+            destination: "/app/logout",
+            body: JSON.stringify(user)
+        });
+    }
+
+    function sendMessage() {
+        const username = document.getElementById('username').value;
+        const message = document.getElementById('message').value;
+        const chatMessage = {
+            username: username,
+            content: message
+        };
+        stompClient.publish({
+            destination: "/app/chat",
+            body: JSON.stringify(chatMessage)
+        });
+    }
+
+    function changeUserStatus() {
+        const username = document.getElementById('username').value;
+        const status = document.getElementById('status').value;
+        const userStatus = {
+            username: username,
+            status: status
+        };
+        stompClient.publish({
+            destination: "/app/status",
+            body: JSON.stringify(userStatus)
+        });
+    }
+</script>
+</body>
+</html>

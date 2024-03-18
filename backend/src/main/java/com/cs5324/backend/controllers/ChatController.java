@@ -20,7 +20,7 @@ public class ChatController {
 
     @GetMapping
     public String returnView() {
-        return "index";
+        return "test";
     }
 
     @MessageMapping("/user")
@@ -41,6 +41,9 @@ public class ChatController {
     @MessageMapping("/chat")
     @SendTo("/topic/chat")
     public ChatMessage sendChatMessage(ChatMessage message) {
+        // User Get By Name
+        message.setUser(userService.getUserByUsername(message.getUsername()));
+        System.out.println(message);
         return messageService.saveMessage(message);
     }
 
