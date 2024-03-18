@@ -1,24 +1,29 @@
-// const stompClient = new StompJs.Client({
-//   brokerURL: "ws://localhost:8080/gs-guide-websocket",
-// });
+const stompClient = new StompJs.Client({
+  brokerURL: "ws://localhost:8080/gs-guide-websocket",
+});
+
 var loggedInUser = null;
 
-// stompClient.onConnect = (frame) => {
-//   setConnected(true);
-//   console.log("Connected: " + frame);
-//   stompClient.subscribe("/topic/greetings", (greeting) => {
-//     showGreeting(JSON.parse(greeting.body).content);
-//   });
-// };
+stompClient.onConnect = (frame) => {
+  setConnected(true);
+  console.log("Connected: " + frame);
 
-// stompClient.onWebSocketError = (error) => {
-//   console.error("Error with websocket", error);
-// };
+  stompClient.subscribe("/topic/user", (message) => {
+    console.log(message);
+  });
 
-// stompClient.onStompError = (frame) => {
-//   console.error("Broker reported error: " + frame.headers["message"]);
-//   console.error("Additional details: " + frame.body);
-// };
+  stompClient.subscribe("/topic/chat", (message) => {
+    console.log(message);
+  });
+};
+
+stompClient.onWebSocketError = (error) => {
+  console.error("Error with websocket", error);
+};
+stompClient.onStompError = (frame) => {
+  console.error("Broker reported error: " + frame.headers["message"]);
+  console.error("Additional details: " + frame.body);
+};
 
 function setConnected(connected) {
   if (connected) {
@@ -31,22 +36,38 @@ function setConnected(connected) {
 }
 
 function connect() {
-  //   stompClient.activate();
   loggedInUser = document.getElementById("username").value;
-  var userJSON = JSON.stringify({ username: loggedInUser, status: "online" });
-  console.log(userJSON);
-  setConnected(true);
-  console.log("Simulate connected");
+  stompClient.activate();
+  login();
 }
 
 function disconnect() {
-  //   stompClient.deactivate();
   setConnected(false);
   setAway(false);
+  logout();
+  stompClient.deactivate();
   console.log("Disconnected");
-  console.log(loggedInUser);
+}
+
+function login() {
+  const user = {
+    username: loggedInUser,
+  };
+  stompClient.publish({
+    destination: "/app/user",
+    body: JSON.stringify(user),
+  });
+}
+
+function logout() {
+  const user = {
+    username: loggedInUser,
+  };
+  stompClient.publish({
+    destination: "/app/logout",
+    body: JSON.stringify(user),
+  });
   loggedInUser = null;
-  console.log(loggedInUser);
 }
 
 function sendChatMsg() {
@@ -89,7 +110,6 @@ function doNotDisturb() {
   console.log(dndJSON);
   setAway(true);
 }
-
 function returnFromDND() {
   var dndJSON = JSON.stringify({
     name: loggedInUser,
@@ -98,7 +118,6 @@ function returnFromDND() {
   console.log(dndJSON);
   setAway(false);
 }
-
 function setAway(status) {
   if (status) {
     $("#online-user").hide();
