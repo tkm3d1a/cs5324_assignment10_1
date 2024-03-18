@@ -51,6 +51,10 @@ public class ChatController {
     @SendTo("/topic/user")
     public ChatUser changeUserStatus(ChatUser user) {
         if (user.getCurrentStatus() == null) return null;
-        return userService.saveUser(user);
+        ChatUser user1 = userService.getUserByUsername(user.getUsername());
+        user1.setCurrentStatus(user.getCurrentStatus());
+        System.out.println(user);
+        System.out.println(user1);
+        return userService.saveUser(user1);
     }
 }
