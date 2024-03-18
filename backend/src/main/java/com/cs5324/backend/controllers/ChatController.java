@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -24,14 +25,18 @@ public class ChatController {
 
     @MessageMapping("/user")
     @SendTo("/topic/user")
+    @Transactional
     public ChatUser userLoggedOn(ChatUser user) {
         return userService.saveUser(user);
     }
 
-    @PostMapping("/logout")
+    @MessageMapping("/logout")
+    @SendTo("/topic/user")
+    @Transactional
     public String logoutUser(ChatUser user) {
         userService.deleteByUsername(user.getUsername());
         return String.format("User %s logged out.", user.getUsername());
+    }
 
     @MessageMapping("/chat")
     @SendTo("/topic/chat")
