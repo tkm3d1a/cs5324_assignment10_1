@@ -31,15 +31,38 @@ stompClient.onStompError = (frame) => {
     console.error("Additional details: " + frame.body);
 };
 
-function setConnected(connected) {
+
+async function setConnected(connected) {
     if (connected) {
         $("#signed-out").hide();
         $("#signed-in").show();
+        await populateUsersCall();
     } else {
         $("#signed-out").show();
         $("#signed-in").hide();
+        $("#users").html("");
+        $("#messages").html("");
     }
-    $("#users").html("");
+}
+
+async function populateUsersCall() {
+    await fetch("http://localhost:8080/api/v1/users").then(
+        result => {
+            result.json().then(
+                prom => {
+                    populateUsers(prom);
+                }
+            )
+        }
+    );
+}
+
+function populateUsers(listOfUsers){
+    const listLen = listOfUsers.length;
+    for(let i = 0;i<listLen;i++){
+        console.log(listOfUsers[i].username);
+        updateUser(listOfUsers[i]);
+    }
 }
 
 function connect() {
@@ -54,7 +77,7 @@ function disconnect() {
     setConnected(false);
     setAway(false);
     logout();
-    stompClient.deactivate().then(r => {
+    stompClient.deactivate().then(() => {
         console.log("disconnected");
     });
 }
@@ -149,8 +172,13 @@ function setAway(status) {
 }
 
 function updateUser(user) {
-    console.log(user.body);
-    const parseUser = JSON.parse(user.body);
+    let parseUser;
+    if(typeof user.body !== 'undefined'){
+        console.log(user.body);
+        parseUser = JSON.parse(user.body);
+    } else {
+        parseUser = user;
+    }
     const element = document.getElementById(parseUser.username);
     if(parseUser.status === "offline"){
         element.parentNode.removeChild(element);

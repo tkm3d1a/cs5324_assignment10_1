@@ -1,9 +1,11 @@
 package com.cs5324.backend.chat.user;
 
+import com.cs5324.backend.enums.Status;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -21,6 +23,11 @@ public class ChatUserService {
     }
     public ChatUser getUserById(Long id){
         return chatUserRepo.findById(id).orElseThrow();
+    }
+    public List<ChatUser> getAllOnlineOrDoNotDisturbUsers(){
+        List<ChatUser> chatUsers;
+        chatUsers = chatUserRepo.findByStatusIn(Arrays.asList(Status.ONLINE,Status.DO_NOT_DISTURB));
+        return chatUsers;
     }
 
     public ChatUser getUserByUsername(String username) {
